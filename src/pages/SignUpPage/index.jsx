@@ -34,6 +34,18 @@ const ROLES = [
 export const SignUpPage = () => {
     const [isRegister, setIsRegister] = useState(false)
     const [selectedRole, setSelectedRole] = useState(null)
+    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));     
+    };
+
+     const handleSubmit = (e) => {
+        e.preventDefault();
+console.log({formData,selectedRole})
+    }; 
+
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -96,7 +108,7 @@ export const SignUpPage = () => {
                                 Selecione como você quer participar
                             </p>
 
-                            <form className="space-y-6">
+                            <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid gap-4">
                                     {ROLES.map(role => {
                                         const Icon = role.icon
@@ -122,23 +134,23 @@ export const SignUpPage = () => {
                                         )
                                     })}
 
-                                    <TextField type="email" label="E-mail" id="email" name="email" placeholder="seu@email.com" required />
+                                    <TextField onChange={handleChange} type="email" label="E-mail" id="email" name="email" placeholder="seu@email.com" required />
 
-                                    <TextField type="password" label="Senha" id="password" name="password" placeholder="********" required />
+                                    <TextField onChange={handleChange} type="password" label="Senha" id="password" name="password" placeholder="********" required />
 
                                     {
-                                        isRegister && <TextField type="name" label="Nome Completo" id="name" name="name" placeholder="Seu nome" required />
+                                        isRegister && <TextField onChange={handleChange} type="name" label="Nome Completo" id="name" name="name" placeholder="Seu nome" required />
                                     }
 
                                     <Button disabled={!selectedRole}>{isRegister ? "Criar conta" : "Entrar"}</Button>
 
                                     <p className="text-center text-sm text-slate-600">
-                                        {isRegister ? "Já tem uma conta?" : "Não tem uma conta?"}{" "} 
+                                        {isRegister ? "Já tem uma conta?" : "Não tem uma conta?"}{" "}
 
                                         <button
-                                        type="button"
-                                        onClick={() => setIsRegister(!isRegister)}
-                                        className="text-slate-900 font-semibold hover:underline cursor-pointer"
+                                            type="button"
+                                            onClick={() => setIsRegister(!isRegister)}
+                                            className="text-slate-900 font-semibold hover:underline cursor-pointer"
                                         >
                                             {!isRegister ? "Criar conta" : "Entrar"}
                                         </button>

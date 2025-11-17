@@ -9,9 +9,11 @@ export const Header = () => {
         <header className="bg-neutral-50 shadow-sm border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="flex justify-between items-center">
-                    <Link to="/">
-                        <Logo />
-                    </Link>
+                    <section className="flex gap-4">
+                        <Link to="/">
+                            <Logo />
+                        </Link>
+                    </section>
 
                     <section className="flex gap-3">
                         {!token ? (
