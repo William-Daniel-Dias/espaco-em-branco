@@ -92,7 +92,6 @@ export const SupporterDashboard = () => {
 
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-6">Solicitações de Uso</h2>
-
                     <div className="space-y-4">
                         <RequestCard
                             title="Workshop de Fotografia "
@@ -100,7 +99,7 @@ export const SupporterDashboard = () => {
                             address="Galeria de arte Moderna"
                             date="04 de dezembro de 2025"
                             artist={{ name: "Juninho Pray" }}
-                            description="Exposição de arte fotografia manual"
+                            description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt, eveniet maiores. Asperiores ut eaque voluptatem? Sit quia impedit error tempora accusamus vel exercitationem placeat consequatur quasi, dolorum assumenda esse est."
                         />
 
                         <RequestCard
@@ -109,7 +108,8 @@ export const SupporterDashboard = () => {
                             address="Galeria de arte Moderna"
                             date="04 de dezembro de 2025"
                             artist={{ name: "Juninho Pray" }}
-                            description="Exposição de arte fotografia manual"
+                            description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt, eveniet maiores. Asperiores ut eaque voluptatem? Sit quia impedit error tempora accusamus vel exercitationem placeat consequatur quasi, dolorum assumenda esse est."
+
 
                         />
 
@@ -119,7 +119,8 @@ export const SupporterDashboard = () => {
                             address="Galeria de arte Moderna"
                             date="04 de dezembro de 2025"
                             artist={{ name: "Juninho Pray" }}
-                            description="Exposição de arte fotografia manual"
+                            description="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt, eveniet maiores. Asperiores ut eaque voluptatem? Sit quia impedit error tempora accusamus vel exercitationem placeat consequatur quasi, dolorum assumenda esse est."
+
 
                         />
                     </div>
