@@ -2,6 +2,7 @@ import { Button } from "../../components/Button"
 import { EventCard } from "../../components/EventCard"
 import { Footer } from "../../components/Footer"
 import { Header } from "../../components/Header"
+import { RequestCard } from "../../components/RequestCard"
 
 export const SupporterDashboard = () => {
     return (
@@ -50,7 +51,34 @@ export const SupporterDashboard = () => {
                     <h2 className="text-2xl font-bold text-slate-900 mb-6">Solicitações de Uso</h2>
 
                     <div className="space-y-4">
+                        <RequestCard
+                            title="Workshop de Fotografia "
+                            status="approved"
+                            address="Galeria de arte Moderna"
+                            date="04 de dezembro de 2025"
+                            artist={{name: "Juninho Pray"}}
+                            description="Exposição de arte fotografia manual"
+                        />
 
+                        <RequestCard
+                            title="Workshop de Fotografia "
+                            status="reject"
+                            address="Galeria de arte Moderna"
+                            date="04 de dezembro de 2025"
+                            artist={{name: "Juninho Pray"}}
+                            description="Exposição de arte fotografia manual"
+
+                        />
+
+                        <RequestCard
+                            title="Workshop de Fotografia "
+                            status="pending"
+                            address="Galeria de arte Moderna"
+                            date="04 de dezembro de 2025"
+                            artist={{name: "Juninho Pray"}}
+                            description="Exposição de arte fotografia manual"
+
+                        />
                     </div>
                 </div>
             </main>
