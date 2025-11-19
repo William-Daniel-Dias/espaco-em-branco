@@ -3,6 +3,7 @@ import { HomePage } from "./pages/HomePage"
 import { SignUpPage } from "./pages/SignUpPage"
 import { SupporterDashboard } from "./pages/SupporterDashboard"
 import { EventPage } from "./pages/EventPage"
+import { ArtistPage } from "./pages/ArtistPage"
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <Route path="/entrar" element={<SignUpPage />} />
       <Route path="/apoiador-dashboard" element={<SupporterDashboard />} />
       <Route path="/evento/:id" element={<EventPage />} />
+      <Route path="/artista-dashboard" element={<ArtistPage />} />
     </Routes>
   )
 }

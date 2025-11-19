@@ -10,7 +10,7 @@ const STATUS = {
     pending: "Pendente"
 }
 
-export const RequestCard = ({ title, status, address, date, artist, description }) => {
+export const RequestCard = ({ variant = "supporter", title, status, address, date, artist, description }) => {
 
     return (
         <div className="bg-neutral-50 rounded-xl shadow-sm border border-slate-600 p-6">
@@ -37,20 +37,31 @@ export const RequestCard = ({ title, status, address, date, artist, description 
                             <span>{address}</span>
                         </figure>
 
-                        <figure className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <span>{date}</span>
-                        </figure>
+                        {variant === "supporter" &&
+                            <>
+                                <figure className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>{date}</span>
+                                </figure>
 
-                        <article className="md:col-span-2">
-                            <span className="font-medium text-slate-900">{artist.name}</span>
-                        </article>
+                                <article className="md:col-span-2">
+                                    <span className="font-medium text-slate-900">{artist.name}</span>
+                                </article>
 
-                        <p className="mt-3 text-slate-600">{description}</p>
+                                <p className="mt-3 text-slate-600">{description}</p>
+                            </>
+                        }
+
+                        {variant === "artist" && (
+                            <figure className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                <span>{date}</span>
+                            </figure>
+                        )}
                     </div>
                 </div>
 
-                {status === "pending" && (
+                {variant === "supporter" && status === "pending" && (
                     <div className="flex gap-2 ml-4">
                         <button className="px-4 py-2 bg-emerald-600 cursor-pointer text-neutral-50 rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2">
                             <CheckCircle className="w-4 h-4" />

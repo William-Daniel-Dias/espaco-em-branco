@@ -1,4 +1,5 @@
 import { TrendingUp } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Users } from "lucide-react"
 import { Calendar } from "lucide-react"
 import { MapPin } from "lucide-react"
@@ -24,7 +25,7 @@ export const EventCard = ({ img, title, address, date, capacity, rules, variant 
                         <span>{address}</span>
                     </figure>
 
-                    {variant === "supporter" && <figure className="flex items-center gap-2 text-slate-600 text-sm">
+                    {variant === "supporter" || variant === "artist" && <figure className="flex items-center gap-2 text-slate-600 text-sm">
                         <Users className="w-4 h-4" />
                         <span>Capacidade: {capacity} pessoas</span>
                     </figure>}
@@ -42,9 +43,16 @@ export const EventCard = ({ img, title, address, date, capacity, rules, variant 
                         <p className="text-sm text-slate-600">{rules}</p>}
 
                     {variant === "public" &&
-                        <button className="px-4 py-2 bg-slate-900 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
+                        <button className="cursor-pointer px-4 py-2 bg-slate-900 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
                             <TrendingUp className="w-4 h-4" />
                             Apoiar
+                        </button>
+                    }
+
+                    {variant === "artist" &&
+                        <button className="cursor-pointer px-4 py-2 bg-slate-900 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
+                            <Plus className="w-4 h-4" />
+                            Solicitar espaço
                         </button>
                     }
                 </article>
