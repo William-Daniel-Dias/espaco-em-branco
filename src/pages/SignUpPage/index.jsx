@@ -3,9 +3,11 @@ import { Users } from "lucide-react"
 import { Palette } from "lucide-react"
 import { ArrowLeft } from "lucide-react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { TextField } from "../../components/TextField"
 import { Button } from "../../components/Button"
+import { toast } from "react-toastify"
+import axios from "axios"
 
 const ROLES = [
     {
@@ -13,50 +15,93 @@ const ROLES = [
         title: "Apoiador",
         description: "Tenho um espaço para oferecer",
         icon: Building2,
-        color: "from-blue-500 to-blue-600"
+        color: "from-blue-500 to-blue-500"
     },
     {
         id: "artist",
         title: "Artista",
-        description: "Encontro espaços e realize seus eventos",
+        description: "Encontre espaços e realize seus eventos",
         icon: Palette,
-        color: "from-purple-500 to-purple-600"
+        color: "from-purple-500 to-purple-500"
     },
     {
         id: "public",
         title: "Público",
         description: "Descubra e apoie eventos culturais",
         icon: Building2,
-        color: "from-emerald-500 to-emerald-600"
+        color: "from-emerald-500 to-emerald-500"
     }
 ]
 
+const PATHS = {
+    "supporter": "/apoiador-dashboard",
+    "artist": "/artista-dashboard",
+    "public": "/"
+}
+
 export const SignUpPage = () => {
+    const navigate = useNavigate()
+
     const [isRegister, setIsRegister] = useState(false)
     const [selectedRole, setSelectedRole] = useState(null)
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));     
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-     const handleSubmit = (e) => {
+    const handleSignUp = async (e) => {
         e.preventDefault();
-console.log({formData,selectedRole})
-    }; 
+
+        try {
+            const payload = { ...formData, userType: selectedRole }
+
+            const response = await axios.post("/auth/register", payload, { baseURL: import.meta.env.VITE_API_URL })
+
+            if (response.status === 201) {
+                toast.success("Cadastro realizado com sucesso")
+
+                setFormData({ name: '', email: '', password: '' })
+                setIsRegister(false)
+            }
+        } catch (error) {
+            console.error({ handleSignUpError: error })
+            toast.error("Ocorreu um erro! Tente novamente em instantes")
+        }
+    };
+
+    const handleSignIn = async (e) => {
+        e.preventDefault();
+
+        try {
+            const payload = { ...formData, userType: selectedRole }
+
+            const response = await axios.post("/auth/login", payload, { baseURL: import.meta.env.VITE_API_URL })
+
+            if (response.status === 200) {
+                localStorage.setItem("token", response.data.accessToken)
+
+                navigate(PATHS[selectedRole])
+            }
+        } catch (error) {
+            console.error({ handleSignUpError: error })
+            toast.error("Ocorreu um erro! Tente novamente em instantes")
+        }
+    };
+
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-8">
             <div className="w-full max-w-6xl">
-                <Link to="/" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-8 transition-colors">
-                    <ArrowLeft className="w-6 h-5">Voltar</ArrowLeft>
+                <Link to="/" className="flex items-center gap-2 text-slate-950 hover:text-slate-600 mb-10 transition-colors">
+                    <ArrowLeft className="w-8 h-8">Voltar</ArrowLeft>
                 </Link>
 
                 <div className="w-full bg-neutral-50 rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
                     <div className="grid md:grid-cols-2">
-                        <div className="bg-linear-to-br from-slate-900 to-slate-800 p-12 text-neutral-50">
+                        <div className="bg-linear-to-br from-slate-950 to-slate-800 p-12 text-neutral-50">
                             <h2 className="text-4xl font-black mb-4">
                                 Bem-vindo ao Espaço em Branco
                             </h2>
@@ -101,14 +146,14 @@ console.log({formData,selectedRole})
                         </div>
 
                         <div className="p-12">
-                            <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                            <h3 className="text-3xl font-bold text-slate-950 mb-2">
                                 {isRegister ? "Criar conta" : "Entrar"}
                             </h3>
                             <p className="text-slate-600 mb-8">
                                 Selecione como você quer participar
                             </p>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <form onSubmit={isRegister? handleSignUp : handleSignIn} className="space-y-6">
                                 <div className="grid gap-4">
                                     {ROLES.map(role => {
                                         const Icon = role.icon
@@ -134,12 +179,12 @@ console.log({formData,selectedRole})
                                         )
                                     })}
 
-                                    <TextField onChange={handleChange} type="email" label="E-mail" id="email" name="email" placeholder="seu@email.com" required />
+                                    <TextField value={formData.email} onChange={handleChange} type="email" label="E-mail" id="email" name="email" placeholder="exemplo@email.com" required />
 
-                                    <TextField onChange={handleChange} type="password" label="Senha" id="password" name="password" placeholder="********" required />
+                                    <TextField value={formData.password} onChange={handleChange} type="password" label="Senha" id="password" name="password" placeholder="********" required />
 
                                     {
-                                        isRegister && <TextField onChange={handleChange} type="name" label="Nome Completo" id="name" name="name" placeholder="Seu nome" required />
+                                        isRegister && <TextField value={formData.name} onChange={handleChange} type="name" label="Nome Completo" id="name" name="name" placeholder="Seu nome" required />
                                     }
 
                                     <Button disabled={!selectedRole}>{isRegister ? "Criar conta" : "Entrar"}</Button>
