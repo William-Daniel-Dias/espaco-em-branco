@@ -2,17 +2,94 @@ import { useState } from 'react';
 import { Search, MapPin, Users, Plus, Calendar } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { TextField } from '../../components/TextField';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export const ArtistPage = () => {
     const [activeTab, setActiveTab] = useState('places');
+    const [spaces, setSpaces] = useState([])
     const [showRequestForm, setShowRequestForm] = useState(false);
-    const [selectedEspaco, setSelectedEspaco] = useState(null);
-    const [showEventForm, setShowEventForm] = useState(false);
+    const [selectedSpace, setSelectedSpace] = useState(null);
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        dateTime: '',
+        financialGoal: '',
+    })
+
+    useEffect(() => {
+        getSpaces()
+    }, [])
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+
+        try {
+            const payload = {
+                ...formData,
+                financialGoal: Number(formData.financialGoal),
+                spaceId: selectedSpace
+            }
+
+            await axios.post('/events', payload, {
+                baseURL: import.meta.env.VITE_API_URL,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+
+            setFormData({
+                title: '',
+                description: '',
+                dateTime: '',
+                financialGoal: '',
+            })
+            setSelectedSpace(null)
+            setShowRequestForm(false)
+            toast.success("Evento cadastrado com sucesso")
+        } catch (error) {
+            console.error({ handleSubmitError: error })
+
+            toast.error("Ocorreu um erro! Tente novamente em instantes")
+        }
+    }
 
     const handleRequestSpace = (spaceId) => {
-        setSelectedEspaco(spaceId);
+        setSelectedSpace(spaceId);
         setShowRequestForm(true);
     };
+
+    const getSpaces = async () => {
+        try {
+            const response = await axios.get("/spaces", {
+                baseURL: import.meta.env.VITE_API_URL,
+
+            })
+
+            setSpaces(response.data)
+        } catch (error) {
+            console.error({ getSpacesError: error })
+        }
+    }
+
+    const getRequests = async () => {
+        try {
+            const response = await axios.get("/spaces", {
+                baseURL: import.meta.env.VITE_API_URL,
+
+            })
+
+            setSpaces(response.data)
+        } catch (error) {
+            console.error({ getSpacesError: error })
+        }
+    }
 
     return (
         <div className="min-h-screen">
@@ -65,15 +142,26 @@ export const ArtistPage = () => {
                         {showRequestForm && (
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
                                 <h3 className="text-xl font-bold text-slate-900 mb-6">Solicitar Uso do Espaço</h3>
-                                <form className="space-y-6">
-                                    <TextField label="Título do Evento" name="title" id="title" type="text" />
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <TextField value={formData.title} onChange={handleChange} label="Título do Evento" name="title" id="title" type="text" />
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <TextField label="Data" name="date" id="date" type="date" />
-                                        <TextField label="Horário" name="time" id="time" type="time" />
+                                        <TextField value={formData.dateTime} onChange={handleChange} label="Data e hora" name="dateTime" id="dateTime" type="datetime-local" />
+
+                                        <TextField value={formData.financialGoal} onChange={handleChange} label="Meta de Arrecadação" name="financialGoal" id="financialGoal" type="number" />
                                     </div>
 
-                                    <TextField label="Descrição do Evento" name="description" id="description" type="text" />
+                                    <fieldset>
+                                        <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">Descrição do Evento</label>
+                                        <textarea
+                                            className="w-full resize-none px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all"
+                                            name="description"
+                                            id="description"
+                                            value={formData.description} onChange={handleChange}
+                                            rows={4}
+                                            placeholder="Descreva como será o evento...">
+                                        </textarea>
+                                    </fieldset>
 
 
                                     <div className="flex gap-3">
@@ -96,44 +184,37 @@ export const ArtistPage = () => {
                         )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[
-                                {
-                                    id: 1,
-                                    img: "https://images.unsplash.com/photo-1680573346177-16adaf21f56f",
-                                    name: "Workshop de Fotografia",
-                                    address: "Galeria de arte Moderna",
-                                    capacity: 300
-                                }].map((espaco) => (
-                                    <div key={espaco.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
-                                        <figure className="h-48 bg-linear-to-br from-slate-200 to-slate-300">
-                                            <img src={espaco.img} alt={espaco.name} className="w-full h-full object-cover" />
-                                        </figure>
+                            {spaces.map((item) => (
+                                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
+                                    <figure className="h-48 bg-linear-to-br from-slate-200 to-slate-300">
+                                        <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                                    </figure>
 
-                                        <div className="p-6">
-                                            <h3 className="text-xl font-bold text-slate-900 mb-3">
-                                                {espaco.name}
-                                            </h3>
-                                            <section className="space-y-2 mb-4">
-                                                <figure className="flex items-center gap-2 text-slate-600 text-sm">
-                                                    <MapPin className="w-4 h-4" />
-                                                    <span>{espaco.address}</span>
-                                                </figure>
-                                                <figure className="flex items-center gap-2 text-slate-600 text-sm">
-                                                    <Users className="w-4 h-4" />
-                                                    <span>Capacidade: {espaco.capacity} pessoas</span>
-                                                </figure>
-                                            </section>
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3">
+                                            {item.name}
+                                        </h3>
+                                        <section className="space-y-2 mb-4">
+                                            <figure className="flex items-center gap-2 text-slate-600 text-sm">
+                                                <MapPin className="w-4 h-4" />
+                                                <span>{item.address}</span>
+                                            </figure>
+                                            <figure className="flex items-center gap-2 text-slate-600 text-sm">
+                                                <Users className="w-4 h-4" />
+                                                <span>Capacidade: {item.capacity} pessoas</span>
+                                            </figure>
+                                        </section>
 
-                                            <button
-                                                onClick={() => handleRequestSpace(espaco.id)}
-                                                className="w-full py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 font-medium"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                                Solicitar Espaço
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => handleRequestSpace(item.id)}
+                                            className="w-full py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 font-medium"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Solicitar Espaço
+                                        </button>
                                     </div>
-                                ))}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -166,7 +247,7 @@ export const ArtistPage = () => {
 
                 {activeTab === 'events' && (
                     <div>
-                        <div className="flex justify-end mb-6">
+                        {/* <div className="flex justify-end mb-6">
                             <button
                                 onClick={() => setShowEventForm(!showEventForm)}
                                 className="px-6 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium"
@@ -210,7 +291,7 @@ export const ArtistPage = () => {
                                     </div>
                                 </form>
                             </div>
-                        )}
+                        )} */}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {[
@@ -238,7 +319,7 @@ export const ArtistPage = () => {
                                                 <Calendar className="w-4 h-4" />
                                                 <span>{evento.date}</span>
                                             </div>
-                                            
+
                                         </div>
                                         <div>
                                             <div className="flex justify-between text-sm mb-2">

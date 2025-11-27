@@ -5,9 +5,71 @@ import { Footer } from "../../components/Footer"
 import { Header } from "../../components/Header"
 import { RequestCard } from "../../components/RequestCard"
 import { TextField } from "../../components/TextField"
+import { toast } from "react-toastify"
+import axios from "axios"
+import { useEffect } from "react"
 
 export const SupporterDashboard = () => {
+    const [spaces, setSpaces] = useState([])
     const [showAddForm, setShowAddForm] = useState(false)
+    const [formData, setFormData] = useState({
+        name: "",
+        address: "",
+        capacity: 0,
+        photoUrl: "",
+        description: ""
+    })
+
+    useEffect(() => {
+        getSpaces()
+    }, [])
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async event => {
+        event.preventDefault()
+
+        try {
+            await axios.post("/spaces", { ...formData, capacity: Number(formData.capacity) },
+                {
+                    baseURL: import.meta.env.VITE_API_URL,
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                })
+
+            setFormData({
+                name: "",
+                address: "",
+                capacity: 0,
+                photoUrl: "",
+                description: ""
+            })
+            setShowAddForm(false)
+            toast.success("Espaço cadastrado com sucesso")
+        } catch (error) {
+            toast.error("Ocorreu um erro! Tente novamente em instantes")
+
+        }
+    }
+
+    const getSpaces = async () => {
+        try {
+            const response = await axios.get("/spaces", {
+                baseURL: import.meta.env.VITE_API_URL,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+
+            setSpaces(response.data)
+        } catch (error) {
+            console.error({ getSpacesError: error })
+        }
+    }
 
     return (
         <div className="min-h-screen bg-neutral-200">
@@ -28,25 +90,28 @@ export const SupporterDashboard = () => {
                             <div className="bg-neutral-50 rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
                                 <h3 className="text-xl font-bold text-slate-900 mb-6">Novo espaço</h3>
 
-                                <form className="grid md:grid-cols-2 gap-6">
-                                    <TextField label="Nome do espaço" name="place-name" id="place-name" type="text" placeholder="Ex. Galeria de Arte Moderna" />
-                                    <TextField label="Capacidade" name="capaccity" id="capaccity" type="number" min="1" step="1" placeholder="Ex. 100" />
-                                    <div className="md:col-span-2">
+                                <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+                                    <TextField value={formData.name} onChange={handleChange} label="Nome do espaço" name="name" id="name" type="text" placeholder="Ex. Galeria de Arte Moderna" />
+                                    <TextField value={formData.capacity} onChange={handleChange} label="Capacidade" name="capacity" id="capacity" type="number" min="1" step="1" placeholder="Ex. 100" />
 
-                                        <TextField label="Endereço" name="address" id="address" type="text" placeholder="Rua, número, bairro, cidade" />
-                                    </div>
                                     <div className="md:col-span-2">
-
-                                        <TextField label="URL da foto" name="photo_url" id="photo_url" type="text" placeholder="http://exemplo.com/foto.png" />
+                                        <TextField value={formData.address} onChange={handleChange} label="Endereço" name="address" id="address" type="text" placeholder="Rua, número, bairro, cidade" />
                                     </div>
+
+                                    <div className="md:col-span-2">
+                                        <TextField value={formData.photoUrl} onChange={handleChange} label="URL da foto" name="photoUrl" id="photoUrl" type="url" placeholder="http://exemplo.com/foto.png" />
+                                    </div>
+
                                     <div className="md:col-span-2">
 
                                         <fieldset>
-                                            <label htmlFor="rules" className="block text-sm font-medium text-slate-700 mb-2">Regras do espaço</label>
+                                            <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">Regras do espaço</label>
                                             <textarea
+                                                value={formData.description}
+                                                onChange={handleChange}
                                                 className="w-full resize-none px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all"
-                                                name="rules"
-                                                id="rules"
+                                                name="description"
+                                                id="description"
                                                 rows={4}
                                                 placeholder="Descreva as regras e condições de uso do espaço...">
                                             </textarea>
@@ -63,30 +128,18 @@ export const SupporterDashboard = () => {
                     }
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <EventCard
-                            variant="supporter"
-                            img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                            title="Exposiçao de Arte comtemporânea"
-                            address="Galeria Arte Moderna"
-                            capacity="200"
-                            rules="Proibido cagar no chão"
-                        />
-                        <EventCard
-                            variant="supporter"
-                            img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                            title="Exposiçao de Arte comtemporânea"
-                            address="Galeria Arte Moderna"
-                            capacity="200"
-                            rules="Proibido cagar no chão"
-                        />
-                        <EventCard
-                            variant="supporter"
-                            img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                            title="Exposiçao de Arte comtemporânea"
-                            address="Galeria Arte Moderna"
-                            capacity="200"
-                            rules="Proibido cagar no chão"
-                        />
+                        {spaces.map(item => (
+                            <EventCard
+                                key={item.id}
+                                variant="supporter"
+                                img={item.photoUrl}
+                                title={item.name}
+                                address={item.address}
+                                capacity={item.capacity}
+                                rules={item.description}
+                            />
+                        ))}
+
                     </div>
                 </div>
 

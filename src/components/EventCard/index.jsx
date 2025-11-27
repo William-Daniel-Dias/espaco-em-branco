@@ -25,10 +25,10 @@ export const EventCard = ({ img, title, address, date, capacity, rules, variant 
                         <span>{address}</span>
                     </figure>
 
-                    {variant === "supporter" || variant === "artist" && <figure className="flex items-center gap-2 text-slate-600 text-sm">
+                    <figure className="flex items-center gap-2 text-slate-600 text-sm">
                         <Users className="w-4 h-4" />
                         <span> Capacidade: {capacity} pessoas</span>
-                    </figure>}
+                    </figure>
 
                     {variant === "public" &&
                         <figure className="flex items-center gap-2 text-slate-600 text-sm">

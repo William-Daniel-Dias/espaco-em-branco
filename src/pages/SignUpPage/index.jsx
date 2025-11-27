@@ -46,6 +46,14 @@ export const SignUpPage = () => {
     const [selectedRole, setSelectedRole] = useState(null)
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
+    const handleRoleSelect = (role) => {
+        if (role === selectedRole) {
+            setSelectedRole(null);
+        } else {
+            setSelectedRole(role);
+        }
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -162,7 +170,7 @@ export const SignUpPage = () => {
                                             <button
                                                 key={role.id}
                                                 type="button"
-                                                onClick={() => setSelectedRole(role.id)}
+                                                onClick={() => handleRoleSelect(role.id)}
                                                 className={`p-4 rounded-xl cursor-pointer border-2 transition-all text-left ${selectedRole === role.id ? 'border-slate-900 bg-slate-50' : "border-slate-200 hover:slate-300"}`}
                                             >
                                                 <div className="flex items-center gap-4">
