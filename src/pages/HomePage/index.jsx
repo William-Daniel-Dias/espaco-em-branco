@@ -42,6 +42,7 @@ export const HomePage = () => {
                             id={item.id}
                             img={item.imageUrl}
                             title={item.title}
+                            capacity={item.space.capacity}
                             address={item.space.address}
                             date={new Date(item.dateTime).toLocaleDateString('pt-BR', { hour12: false })}
                         />
