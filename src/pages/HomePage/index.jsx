@@ -1,8 +1,29 @@
+import axios from "axios"
 import { EventCard } from "../../components/EventCard"
 import { Footer } from "../../components/Footer"
 import { Header } from "../../components/Header"
+import { useState, useEffect } from "react"
 
 export const HomePage = () => {
+    const [events, setEvents] = useState([])
+
+    useEffect(() => {
+        getEvents()
+    }, [])
+
+    const getEvents = async () => {
+        try {
+            const response = await axios.get("/events", {
+                baseURL: import.meta.env.VITE_API_URL
+
+            })
+
+            setEvents(response.data)
+        } catch (error) {
+            console.error({ getSpacesError: error })
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-200">
             <Header />
@@ -15,24 +36,17 @@ export const HomePage = () => {
                 </article>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <EventCard
-                        img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                        title="Exposiçao de Arte Comtemporânea"
-                        address="Galeria Arte Moderna"
-                        date="15 de Dezembro 2029"
-                    />
-                     <EventCard
-                        img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                        title="Festival de Música Independente"
-                        address="Centro Cultural Paulista"
-                        date="20 de Janeiro 2026"
-                    />
-                     <EventCard
-                        img="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                        title="Noite de Teatro Experimental"
-                        address="Teatro Municipal"
-                        date="30 de Junho 2026"
-                    />
+                    {events.map(item => (
+                        <EventCard
+                            key={item.id}
+                            id={item.id}
+                            img={item.imageUrl}
+                            title={item.title}
+                            address={item.space.address}
+                            date={new Date(item.dateTime).toLocaleDateString('pt-BR', { hour12: false })}
+                        />
+                    ))}
+
                 </div>
             </main>
 

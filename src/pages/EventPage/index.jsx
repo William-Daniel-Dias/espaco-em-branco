@@ -1,19 +1,69 @@
 import { ArrowLeft } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { Footer } from "../../components/Footer"
 import { Share2 } from "lucide-react"
 import { Heart } from "lucide-react"
 import { Calendar } from "lucide-react"
 import { MapPin } from "lucide-react"
 import { Users } from "lucide-react"
-import { useState } from "react"
-import { Button } from "../../components/Button"
+import { useState, useEffect } from "react"
 import { TrendingUp } from "lucide-react"
+import axios from "axios"
+import { toast } from "react-toastify"
 
 export const EventPage = () => {
+    const { id } = useParams()
     const token = !!localStorage.getItem("token")
 
     const [amount, setAmount] = useState(10)
+    const [event, setEvent] = useState(null)
+
+    useEffect(() => {
+        getEvents()
+    }, [])
+
+    const getEvents = async () => {
+        try {
+            const response = await axios.get(`/events/${id}`, {
+                baseURL: import.meta.env.VITE_API_URL
+            })
+
+            setEvent(response.data)
+        } catch (error) {
+            console.error({ getSpacesError: error })
+        }
+    }
+
+    const handleSubmit = async () => {
+
+        try {
+            const payload = { value: amount, eventId: id }
+
+            const response = await axios.post(`/payments`, payload, {
+                baseURL: import.meta.env.VITE_API_URL,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+
+            if(response.status === 201){
+
+                toast.success("Contribuição realizada com sucesso")
+    
+                getEvents()
+            }
+        } catch (error) {
+            console.error({ handleSubmitError: error })
+
+            toast.error("ocorreu um erro! Tente novamente em instantes")
+
+        }
+    }
+
+    if (!event) return
+
+    const progressPercentage = (event.currentProgress / event.financialGoal) * 100;
+
 
     return (
         <div className="min-h-screen bg-neutral-200">
@@ -31,8 +81,8 @@ export const EventPage = () => {
                         <div className="bg-neutral-50 rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                             <figure className="h-96 bg-linear-to-br from-slate-200 to-slate-300">
                                 <img
-                                    src="https://images.unsplash.com/photo-1680573346177-16adaf21f56f"
-                                    alt="Exposiçao de Arte comtemporânea"
+                                    src={event.imageUrl}
+                                    alt={event.title}
                                     className="h-full w-full"
                                 />
                             </figure>
@@ -40,9 +90,9 @@ export const EventPage = () => {
                             <div className="p-8">
                                 <section className="flex items-start justify-between mb-6">
                                     <article>
-                                        <h1 className="text-4xl font-bold text-slate-900 mb-2">Exposiçao de Arte comtemporânea</h1>
+                                        <h1 className="text-4xl font-bold text-slate-900 mb-2">{event.title}</h1>
 
-                                        <p className="text-slate-600">por Juninho Pray</p>
+                                        <p className="text-slate-600">por {event.artist.name}</p>
                                     </article>
 
                                     <section className="flex gap-2">
@@ -60,33 +110,33 @@ export const EventPage = () => {
                                     <article className="bg-slate-50 rounded-lg p-4">
                                         <Calendar className="w-6 h-6 text-slate-900 mb-2" />
                                         <p className="text-sm text-slate-600">Data</p>
-                                        <p className="font-semibold text-slate-900">04 de Dezembro de 2025</p>
+                                        <p className="font-semibold text-slate-900">{new Date(event.dateTime).toLocaleDateString('pt-BR', { hour12: false })}</p>
                                     </article>
 
                                     <article className="bg-slate-50 rounded-lg p-4">
                                         <MapPin className="w-6 h-6 text-slate-900 mb-2" />
                                         <p className="text-sm text-slate-600">Local</p>
-                                        <p className="font-semibold text-slate-900">Galeria Arte Moderna</p>
+                                        <p className="font-semibold text-slate-900">{event.space.name}</p>
                                     </article>
 
                                     <article className="bg-slate-50 rounded-lg p-4">
                                         <Users className="w-6 h-6 text-slate-900 mb-2" />
                                         <p className="text-sm text-slate-600">Capacidade</p>
-                                        <p className="font-semibold text-slate-900">300 pessoas</p>
+                                        <p className="font-semibold text-slate-900">{event.space.capacity}</p>
                                     </article>
                                 </div>
 
                                 <article className="mb-8">
                                     <h2 className="text-2xl font-bold text-slate-900 mb-4">Sobre o Evento</h2>
-                                    <p className="text-slate-600 leading-relaxed">Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis in dolore sit accusamus assumenda commodi, vel beatae iste totam qui. Iusto cupiditate ab itaque suscipit quo fugit dignissimos consequatur officiis.</p>
+                                    <p className="text-slate-600 leading-relaxed">{event.description}</p>
                                 </article>
 
                                 <div className="bg-slate-50 rounded-lg p-6">
                                     <h3 className="text-xl font-bold text-slate-900 mb-4">Informações do espaço</h3>
 
                                     <article className="space-y-2 text-slate-600">
-                                        <p><span className="font-semibold text-slate-900">Endereço:</span> Rua das Flores, 123</p>
-                                        <p><span className="font-semibold text-slate-900">Capacidade:</span> 300 pessoas</p>
+                                        <p><span className="font-semibold text-slate-900">Endereço:</span>{event.space.address}</p>
+                                        <p><span className="font-semibold text-slate-900">Capacidade:</span> {event.space.capacity} pessoas</p>
                                     </article>
                                 </div>
                             </div>
@@ -98,22 +148,22 @@ export const EventPage = () => {
                             <div className="mb-6">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-slate-600">Progresso da Campanha</span>
-                                    <span className="text-sm font-semibold text-slate-900">90%</span>
+                                    <span className="text-sm font-semibold text-slate-900">{progressPercentage.toLocaleString({ maximumFractionDigits: 0 })}%</span>
                                 </div>
 
                                 <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden mb-3">
                                     <div className="bg-linear-to-r from-emerald-500 to-emerald-600 h-full rounded-full transition-all duration-500"
-                                        style={{ width: `${Math.min(90, 100)}%` }} />
+                                        style={{ width: `${progressPercentage}%` }} />
                                 </div>
 
                                 <div className="flex justify-between mb-6">
                                     <article>
-                                        <p className="text-2xl font-bold text-slate-900">R$ 450</p>
+                                        <p className="text-2xl font-bold text-slate-900">{event.currentProgress.toLocaleString('pt-br', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 })}</p>
                                         <p className="text-sm text-slate-600">Arrecadado</p>
                                     </article>
 
                                     <article className="text-right">
-                                        <p className="text-2xl font-bold text-slate-900">R$ 500</p>
+                                        <p className="text-2xl font-bold text-slate-900">{event.financialGoal.toLocaleString('pt-br', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 })}</p>
                                         <p className="text-sm text-slate-600">Meta</p>
                                     </article>
                                 </div>
@@ -138,7 +188,7 @@ export const EventPage = () => {
                                     </div>
                                 </div>
 
-                                <button disabled={!token} className="w-full py-3 bg-slate-900 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 font-medium text-lg cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                                <button onClick={handleSubmit} disabled={!token} className="w-full py-3 bg-slate-900 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 font-medium text-lg cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                                     <TrendingUp className="w-5 h-5" />
                                     Contribuir
                                 </button>

@@ -3,8 +3,9 @@ import { HandFist } from "lucide-react"
 import { Users } from "lucide-react"
 import { Calendar } from "lucide-react"
 import { MapPin } from "lucide-react"
+import { Link } from "react-router-dom"
 
-export const EventCard = ({ img, title, address, date, capacity, rules, variant = "public" }) => {
+export const EventCard = ({ id, img, title, address, date, capacity, rules, variant = "public" }) => {
     return (
         <div className="w-full bg-neutral-50 rounded-xl shadow-sm border border-slate-300 overflow-hidden hover:shadow-md transition-all cursor-pointer group">
             <figure className="h-48 bg-linear-to-br from-slate-200 to-slate-300 relative overflow-hidden">
@@ -43,10 +44,10 @@ export const EventCard = ({ img, title, address, date, capacity, rules, variant 
                         <p className="text-sm text-slate-600">{rules}</p>}
 
                     {variant === "public" &&
-                        <button className="cursor-pointer px-4 py-2 bg-slate-950 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
+                        <Link to={`/evento/${id}`} className="cursor-pointer px-4 py-2 bg-slate-950 text-neutral-50 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
                             <HandFist className="w-4 h-4" />
                             Apoiar
-                        </button>
+                        </Link>
                     }
 
                     {variant === "artist" &&

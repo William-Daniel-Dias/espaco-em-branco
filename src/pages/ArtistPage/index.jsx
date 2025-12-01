@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 export const ArtistPage = () => {
     const [activeTab, setActiveTab] = useState('places');
     const [spaces, setSpaces] = useState([])
+    const [events, setEvents] = useState([])
     const [showRequestForm, setShowRequestForm] = useState(false);
     const [selectedSpace, setSelectedSpace] = useState(null);
     const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ export const ArtistPage = () => {
 
     useEffect(() => {
         getSpaces()
+
+        getEvents()
     }, [])
 
     const handleChange = (e) => {
@@ -78,14 +81,16 @@ export const ArtistPage = () => {
         }
     }
 
-    const getRequests = async () => {
+    const getEvents = async () => {
         try {
-            const response = await axios.get("/spaces", {
+            const response = await axios.get("/events/artists", {
                 baseURL: import.meta.env.VITE_API_URL,
-
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
             })
 
-            setSpaces(response.data)
+            setEvents(response.data)
         } catch (error) {
             console.error({ getSpacesError: error })
         }
@@ -106,7 +111,7 @@ export const ArtistPage = () => {
                     >
                         Buscar Espaços
                     </button>
-                    <button
+                    {/* <button
                         onClick={() => setActiveTab('request')}
                         className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === 'request'
                             ? 'border-slate-900 text-slate-900'
@@ -114,7 +119,7 @@ export const ArtistPage = () => {
                             }`}
                     >
                         Minhas Solicitações
-                    </button>
+                    </button> */}
                     <button
                         onClick={() => setActiveTab('events')}
                         className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === 'events'
@@ -294,22 +299,14 @@ export const ArtistPage = () => {
                         )} */}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {[
-                                {
-                                    id: 1,
-                                    status: "approved",
-                                    date: "04 de dezembro de 2025",
-                                    goal: 500,
-                                    amount: 450
-                                }
-                            ].map((evento) => {
-                                const progressPercentage = (evento.amount / evento.goal) * 100;
+                            {events.map((evento) => {
+                                const progressPercentage = (evento.currentProgress / evento.financialGoal) * 100;
 
                                 return (
                                     <div key={evento.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                                         <div className="flex justify-between items-start mb-4">
                                             <h3 className="text-xl font-bold text-slate-900">{evento.titulo}</h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${evento.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${evento.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
                                                 }`}>
                                                 {evento.status}
                                             </span>
@@ -317,7 +314,7 @@ export const ArtistPage = () => {
                                         <div className="space-y-3 mb-4">
                                             <div className="flex items-center gap-2 text-slate-600 text-sm">
                                                 <Calendar className="w-4 h-4" />
-                                                <span>{evento.date}</span>
+                                                <span>{new Date(evento.dateTime).toLocaleDateString('pt-BR', {hour12:false})}</span>
                                             </div>
 
                                         </div>
@@ -333,8 +330,8 @@ export const ArtistPage = () => {
                                                 />
                                             </div>
                                             <div className="flex justify-between text-sm mt-2">
-                                                <span className="text-slate-600">R$ {evento.amount.toLocaleString('pt-BR')}</span>
-                                                <span className="font-semibold text-slate-900">R$ {evento.goal.toLocaleString('pt-BR')}</span>
+                                                <span className="text-slate-600">R$ {evento.currentProgress.toLocaleString('pt-BR')}</span>
+                                                <span className="font-semibold text-slate-900">R$ {evento.financialGoal.toLocaleString('pt-BR')}</span>
                                             </div>
                                         </div>
                                     </div>

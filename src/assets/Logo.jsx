@@ -2,8 +2,8 @@ export const Logo = (props) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 800 400"
-        width={160}
-        height={80}
+        width={150}
+        height={75}
         {...props}
     >
         <defs>

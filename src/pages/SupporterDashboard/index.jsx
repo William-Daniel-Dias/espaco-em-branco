@@ -143,7 +143,7 @@ export const SupporterDashboard = () => {
                     </div>
                 </div>
 
-                <div>
+                {/* <div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-6">Solicitações de Uso</h2>
                     <div className="space-y-4">
                         <RequestCard
@@ -177,7 +177,7 @@ export const SupporterDashboard = () => {
 
                         />
                     </div>
-                </div>
+                </div> */}
             </main>
 
             <Footer />
